@@ -199,6 +199,18 @@ a{color:inherit;}
   align-items:flex-end;
   overflow:hidden;
 }
+/* keep both faces in frame (faces sit ~36–74% across, ~22–49% down 01_Banner) */
+.hero .parallax-bg{background-color:var(--bg-0);background-repeat:no-repeat;background-position:55% 30%;}
+@media (max-aspect-ratio:7/8){
+  /* on tall/narrow screens "cover" would crop one of us out; size by width instead
+     and fade the photo's bottom edge into the page background */
+  .hero .parallax-bg{background-size:220vw auto;background-position:55% 15svh;}
+  .hero .parallax-bg::after{
+    content:'';position:absolute;left:0;right:0;
+    top:calc(15svh + 146.7vw - 35vw);height:35vw;
+    background:linear-gradient(180deg,transparent,var(--bg-0));
+  }
+}
 .hero-overlay{
   position:absolute;inset:0;
   background:linear-gradient(180deg, rgba(13,12,15,0.25) 0%, rgba(13,12,15,0.6) 60%, var(--bg-0) 100%);
@@ -281,7 +293,7 @@ a{color:inherit;}
   border:2px solid var(--gold);
   box-shadow:0 0 0 6px rgba(203,161,92,0.12), 0 20px 40px rgba(0,0,0,0.4);
 }
-.couple-photo img{width:100%;height:100%;object-fit:cover;}
+.couple-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;}
 .couple-name{
   font-family:var(--font-display);
   font-size:30px;
@@ -322,6 +334,7 @@ a{color:inherit;}
   overflow:hidden;
   text-align:center;
 }
+.date-section .parallax-bg{background-position:52% 48%;}
 .date-overlay{
   position:absolute;inset:0;
   background:linear-gradient(180deg, rgba(13,12,15,0.55), rgba(13,12,15,0.85));
@@ -466,6 +479,7 @@ a{color:inherit;}
   padding:100px 0 60px;
   text-align:center;
 }
+.footer-section .parallax-bg{background-position:50% 58%;}
 .footer-overlay{
   position:absolute;inset:0;
   background:linear-gradient(180deg, var(--bg-0), rgba(13,12,15,0.75));
