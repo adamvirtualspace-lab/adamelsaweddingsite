@@ -11,16 +11,22 @@
 
 const SHEET_NAME = 'Sheet1';
 
+// Stop guest input like "=HYPERLINK(...)" from being run as a Sheet formula.
+function safeCell(value) {
+  const s = String(value == null ? '' : value);
+  return /^[=+\-@]/.test(s) ? "'" + s : s;
+}
+
 function doPost(e) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
   const data = JSON.parse(e.postData.contents);
 
   sheet.appendRow([
     new Date(),
-    data.name || '',
-    data.attendance || '',
-    data.guests || '',
-    data.message || '',
+    safeCell(data.name),
+    safeCell(data.attendance),
+    safeCell(data.guests),
+    safeCell(data.message),
   ]);
 
   return ContentService
@@ -33,13 +39,13 @@ function doGet() {
   const rows = sheet.getDataRange().getValues();
   const [, ...body] = rows; // skip header row
 
-  const wishes = body.map((row) => ({
-    timestamp: row[0],
-    name: row[1],
-    attendance: row[2],
-    guests: row[3],
-    message: row[4],
-  }));
+  // Public endpoint: only return what the guestbook shows — never attendance or guest counts.
+  const wishes = body
+    .filter((row) => row[4])
+    .map((row) => ({
+      name: row[1],
+      message: row[4],
+    }));
 
   return ContentService
     .createTextOutput(JSON.stringify(wishes))

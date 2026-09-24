@@ -11,7 +11,7 @@
   const guest = params.get('to') || params.get('nama');
   if (guest) {
     const el = document.getElementById('guestName');
-    if (el) el.textContent = decodeURIComponent(guest.replace(/\+/g, ' '));
+    if (el) el.textContent = guest;
   }
 
   // ---------- gate / open invitation ----------
@@ -79,9 +79,14 @@
       el.style.transform = `translate3d(0, ${offset}px, 0)`;
     });
 
+    const pad = 40;
+    const span = window.innerHeight + pad * 2;
     fxEls.forEach((el) => {
       const speed = parseFloat(el.dataset.speed || '0.2');
-      el.style.transform = `translate3d(0, ${scrollY * speed * -1}px, 0)`;
+      const base = el.offsetTop; // untransformed position
+      // drift upward with scroll, re-entering from the bottom once off the top
+      const y = ((((base - scrollY * speed + pad) % span) + span) % span) - pad;
+      el.style.transform = `translate3d(0, ${y - base}px, 0)`;
     });
 
     ticking = false;
@@ -146,7 +151,6 @@
       if (Array.isArray(data)) {
         data
           .filter((row) => row.message)
-          .reverse()
           .forEach((row) => renderWish(row.name, row.message));
       }
     } catch (err) {
