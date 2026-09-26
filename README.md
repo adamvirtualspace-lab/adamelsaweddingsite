@@ -5,7 +5,16 @@ Akad 13.00 WIB · Resepsi 16.00 WIB.
 
 Plain HTML/CSS/JS, no build step. See [PLAN.md](PLAN.md) for design decisions.
 
-The opening screen is a low-poly 3D model of the Golden Boutique Hotel ([gate3d.js](gate3d.js), Three.js loaded from jsDelivr). The camera eases in from the left at eye level, then sways with the mouse (desktop) or the phone's tilt (gyro; iOS asks for permission on the first tap). Tapping "Buka Undangan" walks the camera around the fountain and up the red carpet, the lobby doors swing open, and the invitation appears. If WebGL or the CDN isn't available, the plain gate still works.
+The opening screen is a low-poly 3D model of the Golden Boutique Hotel ([gate3d.js](gate3d.js), Three.js loaded from jsDelivr). The camera eases in from the left at eye level, then sways with the mouse (desktop) or the phone's tilt (gyro; iOS asks for permission on the first tap). Tapping "Buka Undangan" walks the camera around the fountain and up the red carpet, and the lobby doors swing open. QS. Az-Zariyat: 49 appears over the white flash, then the guest lands in a low-poly hotel lobby ([lobby3d.js](lobby3d.js)) with photos framed on the walls in three clickable groups:
+
+- **Kedua Mempelai**: a camera tour of Adam's portrait, the couple photo, then Elsa's portrait, with cards naming each and their parents.
+- **Lokasi & Tempat**: the map board, plus a card with a Google map, the Akad/Resepsi times, and a "Buka Google Maps" button.
+- **Cerita Kami**: turns to the right-wall gallery, where each photo opens on its own.
+
+"Lanjut ke Undangan" opens the invitation. If WebGL or the CDN isn't available, the plain gate still works.
+
+- **Photos:** listed in `PHOTOS` at the top of [lobby3d.js](lobby3d.js) (file, group, wall position, size). To add more to the right-wall gallery, add entries with `group: 'gallery'`.
+- **Card text** (names, parents, times) is in the `lobby-card` block of [index.html](index.html).
 
 ## Run locally
 
@@ -19,11 +28,10 @@ Then visit `http://localhost:8000/?to=Nama+Tamu` — the `to` query param person
 
 ## Before you launch — placeholders to fill in
 
-- **Parents' names** — in `index.html`, search for `[Nama Ayah` / `[Nama Ibu` and replace.
 - **Bank account holder name** — in `index.html`, search for `[Nama Pemilik Rekening]`.
 - **Google Maps pin** — the "Lihat Lokasi" buttons currently link to a text search for "Golden Boutique Hotel Jakarta". Swap in your exact Google Maps share link if you have a preferred pin (in `index.html`, the two `href="https://www.google.com/maps/..."` links).
 - **Background music** — add an MP3 at `assets/audio/backsound.mp3` (any royalty-free track, or a song you two like — check licensing if it's commercial). The site works fine without it; the music button just won't play anything until the file exists.
-- **Opening quote** — currently QS. Ar-Rum: 21, in the `.quote-section` of `index.html`. Swap for a different verse/quote if you'd like.
+- **Opening quote** — currently QS. Az-Zariyat: 49 (Arabic + Indonesian translation), in the `.quote-section` of `index.html`. Swap for a different verse/quote if you'd like.
 
 ## Wiring up RSVP + Guestbook (Google Sheet)
 

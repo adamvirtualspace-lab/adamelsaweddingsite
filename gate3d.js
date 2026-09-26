@@ -1,7 +1,10 @@
 // Low-poly Golden Boutique Hotel — the opening scene behind the gate.
+// After the doors open, the verse shows on the white flash and the guest lands
+// in the lobby (lobby3d.js).
 // Exposes window.weddingGate = { flyIn(): Promise, dispose() } for script.js.
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { createLobby } from './lobby3d.js';
 
 const gate = document.getElementById('gate');
 const canvas = document.getElementById('gateCanvas');
@@ -358,12 +361,18 @@ function init() {
   }
 
   // ---------- animation state ----------
+  // intro -> idle -> walk (doors open, white flash) -> ayat (verse on the flash)
+  // -> lobby (look around, tap photos) -> leave (resolves flyIn's promise)
   const clock = new THREE.Clock();
   const INTRO = 7; // seconds of slow zoom-in from the left
+  const AYAT_HOLD = 6500; // ms the verse stays up (a tap skips ahead)
   let state = 'intro';
   let walk = null;
+  let ayat = null;
+  let active = scene;
   let raf = 0;
   const flash = gate.querySelector('.gate-flash');
+  const lobby = createLobby();
 
   const easeOut = (t) => 1 - Math.pow(1 - t, 3);
   const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
@@ -373,33 +382,49 @@ function init() {
 
   function frame() {
     raf = requestAnimationFrame(frame);
+    try {
+      step();
+    } catch (err) {
+      // never leave a guest stuck behind a broken scene
+      console.error(err);
+      cancelAnimationFrame(raf);
+      if (walk) walk.resolve();
+    }
+  }
+
+  function step() {
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.elapsedTime;
 
-    // drifting motes
-    const pos = motes.geometry.attributes.position;
-    for (let i = 0; i < MOTES; i++) {
-      let y = pos.getY(i) + moteSpeed[i] * dt;
-      if (y > 26) y = 0;
-      pos.setY(i, y);
-      pos.setX(i, pos.getX(i) + Math.sin(t * 0.5 + i) * 0.004);
-    }
-    pos.needsUpdate = true;
-    statueGlow.material.opacity = 0.22 + Math.sin(t * 1.4) * 0.06;
-
     pointer.sx += (pointer.x - pointer.sx) * 0.05;
     pointer.sy += (pointer.y - pointer.sy) * 0.05;
-    const swayAz = Math.sin(t * 0.2) * 0.025 + pointer.sx * 0.16;
-    const swayLook = TARGET.y - pointer.sy * 1.6;
+
+    if (active === scene) {
+      // drifting motes
+      const pos = motes.geometry.attributes.position;
+      for (let i = 0; i < MOTES; i++) {
+        let y = pos.getY(i) + moteSpeed[i] * dt;
+        if (y > 26) y = 0;
+        pos.setY(i, y);
+        pos.setX(i, pos.getX(i) + Math.sin(t * 0.5 + i) * 0.004);
+      }
+      pos.needsUpdate = true;
+      statueGlow.material.opacity = 0.22 + Math.sin(t * 1.4) * 0.06;
+    }
 
     if (state === 'intro' || state === 'idle') {
       const k = easeOut(Math.min(1, t / INTRO));
       if (k >= 1) state = 'idle';
-      placeCamera(THREE.MathUtils.lerp(-0.34, 0, k) + swayAz, THREE.MathUtils.lerp(rest.r * 1.6, rest.r, k), swayLook);
+      const swayAz = Math.sin(t * 0.2) * 0.025 + pointer.sx * 0.16;
+      placeCamera(THREE.MathUtils.lerp(-0.34, 0, k) + swayAz, THREE.MathUtils.lerp(rest.r * 1.6, rest.r, k), TARGET.y - pointer.sy * 1.6);
     } else if (state === 'walk') {
       stepWalk(performance.now() - walk.start);
+    } else if (state === 'ayat') {
+      stepAyat(performance.now() - ayat.start, t);
     }
-    renderer.render(scene, camera);
+    if (active === lobby.scene) lobby.update(camera, t, dt, pointer);
+    if (state === 'lobby') tickLobby();
+    renderer.render(active, camera);
   }
 
   // walk around the fountain, up the carpet, doors swing open, step inside
@@ -437,14 +462,203 @@ function init() {
     hall.intensity = 30 + 90 * doorK;
     porticoLight.intensity = 45 + 60 * doorK;
     if (flash) flash.style.opacity = String(smooth(W.enterAt + W.enterMs * 0.4, W.endMs, ms));
-    if (ms >= W.endMs) {
-      state = 'done';
-      W.resolve();
+    if (ms >= W.endMs) startAyat();
+  }
+
+  // the verse fades in over the white flash; behind it we swap to the lobby
+  function startAyat() {
+    state = 'ayat';
+    ayat = { start: performance.now(), hidden: false, entered: false };
+    gate.classList.add('show-ayat');
+    renderer.compile(lobby.scene, camera); // warm up shaders while the screen is white
+  }
+
+  function stepAyat(ms, t) {
+    if (!ayat.hidden && ms >= AYAT_HOLD) {
+      ayat.hidden = true;
+      gate.classList.remove('show-ayat');
+    }
+    if (!ayat.entered && ms >= AYAT_HOLD + 900) {
+      ayat.entered = true;
+      active = lobby.scene;
+      lobby.enter(camera);
+    }
+    if (ayat.entered && flash) flash.style.opacity = String(1 - smooth(AYAT_HOLD + 900, AYAT_HOLD + 2900, ms));
+    if (ms >= AYAT_HOLD + 2900) {
+      state = 'lobby';
+      gate.classList.add('in-lobby');
     }
   }
 
+  // tap during the verse to move on sooner
+  gate.addEventListener('pointerdown', () => {
+    if (state !== 'ayat') return;
+    const ms = performance.now() - ayat.start;
+    if (ms > 1500 && ms < AYAT_HOLD) ayat.start = performance.now() - AYAT_HOLD;
+  });
+
+  // ---------- lobby: labelled photo groups ----------
+  // rest   -> look around; hover (or on phones, always) shows each group's label
+  // couple -> tour: Adam (card) -> together -> Elsa (card); a tap skips ahead
+  // map    -> map board + card with Google Maps and the Akad/Resepsi times
+  // story  -> turn to the right-wall gallery; tap a photo -> photo (back returns here)
+  const COUPLE_TOUR = [
+    { id: 'adam', card: 'groom' },
+    { id: 'together', card: 'couple' },
+    { id: 'elsa', card: 'bride' },
+  ];
+  const TOUR_GLIDE = 2.6, TOUR_HOLD = 4500;
+  const lobbyUi = document.getElementById('lobbyUi');
+  const lobbyHint = document.getElementById('lobbyHint');
+  const lobbyBack = document.getElementById('lobbyBack');
+  const lobbyNext = document.getElementById('lobbyNext');
+  const card = document.getElementById('lobbyCard');
+  const tags = [...document.querySelectorAll('.lobby-tag')];
+  if (lobbyHint) {
+    lobbyHint.textContent = isTouch
+      ? 'Miringkan ponsel untuk melihat sekeliling · ketuk foto untuk membuka'
+      : 'Arahkan kursor ke foto · klik untuk membuka';
+  }
+
+  let view = { name: 'rest' };
+  let hovered = null;
+  let cardTimer = 0;
+
+  function showCard(name, delay) {
+    clearTimeout(cardTimer);
+    if (!card) return;
+    card.classList.remove('is-open');
+    if (!name) return;
+    cardTimer = setTimeout(() => {
+      card.dataset.show = name;
+      if (name === 'map') {
+        // load the Google map only when someone actually opens it
+        const frame = card.querySelector('iframe[data-src]');
+        if (frame && !frame.src) frame.src = frame.dataset.src;
+      }
+      card.classList.add('is-open');
+    }, delay);
+  }
+
+  function setView(next) {
+    view = next;
+    if (!lobbyUi) return;
+    lobbyUi.classList.toggle('is-focused', next.name !== 'rest');
+    lobbyUi.classList.toggle('is-story', next.name === 'story');
+    setHover(null);
+  }
+
+  function setHover(group) {
+    if (group === hovered) return;
+    hovered = group;
+    lobby.highlight(group);
+    canvas.style.cursor = group ? 'pointer' : '';
+  }
+
+  function openGroup(group, entry) {
+    if (group === 'couple') {
+      setView({ name: 'couple', step: 0, next: performance.now() + 1800 + TOUR_HOLD });
+      lobby.goItem(camera, 'adam', 'caption', 1.8);
+      showCard('groom', 1300);
+    } else if (group === 'map') {
+      setView({ name: 'map' });
+      lobby.goItem(camera, 'map', 'tall', 1.6);
+      showCard('map', 1100);
+    } else if (group === 'story') {
+      setView({ name: 'story' });
+      lobby.goGallery(camera, 2.2);
+      showCard(null);
+    } else if (group === 'gallery' && entry) {
+      setView({ name: 'photo', parent: view.name === 'story' ? 'story' : 'rest' });
+      lobby.goItem(camera, entry.id, 'center', 1.3);
+      showCard(null);
+    }
+  }
+
+  function nextTourStep() {
+    const step = view.step + 1;
+    if (step >= COUPLE_TOUR.length) return back();
+    view.step = step;
+    view.next = performance.now() + TOUR_GLIDE * 1000 + TOUR_HOLD;
+    lobby.goItem(camera, COUPLE_TOUR[step].id, 'caption', TOUR_GLIDE);
+    showCard(COUPLE_TOUR[step].card, TOUR_GLIDE * 1000 - 500);
+  }
+
+  function back() {
+    if (view.name === 'photo' && view.parent === 'story') return openGroup('story');
+    setView({ name: 'rest' });
+    lobby.goRest(camera, 1.6);
+    showCard(null);
+  }
+
+  // called every frame while in the lobby
+  function tickLobby() {
+    if (view.name === 'couple' && view.step < COUPLE_TOUR.length - 1 && performance.now() >= view.next) nextTourStep();
+    // float each group's label over its photos
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    const showAll = isTouch && view.name === 'rest' && lobby.settled();
+    for (const tag of tags) {
+      const group = tag.dataset.group;
+      tmp.copy(lobby.anchors[group]).project(camera);
+      const inFront = tmp.z < 1;
+      // keep labels on screen; on phones, groups out of view get pinned to the edge
+      const half = tag.offsetWidth / 2 + 10;
+      const x = ((tmp.x + 1) / 2) * w;
+      const cx = Math.min(w - half, Math.max(half, x));
+      const edge = x < 0 ? 'left' : x > w ? 'right' : '';
+      tag.dataset.edge = edge;
+      const show = inFront && view.name === 'rest' && (showAll || (hovered === group && !edge));
+      tag.classList.toggle('is-visible', show);
+      tag.style.transform = `translate(${cx}px, ${((1 - tmp.y) / 2) * h}px) translate(-50%, -100%)`;
+    }
+  }
+
+  const toNdc = (e) => {
+    const r = canvas.getBoundingClientRect();
+    return [((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1];
+  };
+  // groups you can open from each view
+  const clickable = (entry) => {
+    if (!entry) return false;
+    if (view.name === 'rest') return true;
+    if (view.name === 'story') return entry.group === 'gallery' || entry.group === 'story';
+    return false;
+  };
+  let downAt = null;
+  canvas.addEventListener('pointerdown', (e) => { downAt = [e.clientX, e.clientY]; });
+  canvas.addEventListener('pointerup', (e) => {
+    if (state !== 'lobby' || !downAt) return;
+    const moved = Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]);
+    downAt = null;
+    if (moved > 10) return;
+    const entry = lobby.pick(camera, ...toNdc(e));
+    if (clickable(entry)) {
+      // in the story view, the column photos open on their own too
+      openGroup(view.name === 'story' ? 'gallery' : entry.group, entry);
+    } else if (view.name === 'couple') {
+      nextTourStep();
+    } else if (view.name !== 'rest') {
+      back();
+    }
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (state !== 'lobby' || e.pointerType !== 'mouse') return;
+    const entry = lobby.pick(camera, ...toNdc(e));
+    setHover(clickable(entry) ? (view.name === 'story' ? 'gallery' : entry.group) : null);
+  });
+  canvas.addEventListener('pointerleave', () => setHover(null));
+  for (const tag of tags) tag.addEventListener('click', () => { if (state === 'lobby' && view.name === 'rest') openGroup(tag.dataset.group); });
+  if (lobbyBack) lobbyBack.addEventListener('click', back);
+  if (lobbyNext) lobbyNext.addEventListener('click', () => {
+    if (state !== 'lobby') return;
+    state = 'leave';
+    gate.classList.remove('in-lobby');
+    walk.resolve();
+  });
+
   // ---------- public API ----------
   window.weddingGate = {
+    // resolves once the guest leaves the lobby for the invitation
     flyIn() {
       if (walk) return walk.promise;
       gate.classList.add('is-flying');
@@ -482,13 +696,15 @@ function init() {
       window.removeEventListener('pointermove', onPointer);
       window.removeEventListener('pointerdown', onPointer);
       window.removeEventListener('deviceorientation', onOrient);
-      scene.traverse((o) => {
-        if (o.geometry) o.geometry.dispose();
-        if (o.material) {
-          if (o.material.map) o.material.map.dispose();
-          o.material.dispose();
-        }
-      });
+      for (const s of [scene, lobby.scene]) {
+        s.traverse((o) => {
+          if (o.geometry) o.geometry.dispose();
+          if (o.material) {
+            if (o.material.map) o.material.map.dispose();
+            o.material.dispose();
+          }
+        });
+      }
       envMap.dispose();
       pmrem.dispose();
       renderer.dispose();
