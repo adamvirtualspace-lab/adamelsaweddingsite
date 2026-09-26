@@ -17,7 +17,7 @@
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Amiri:wght@400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -53,7 +53,66 @@
       </button>
     </div>
   </div>
+  <!-- inside the lobby: look around, tap a photo, continue to the invitation -->
+  <div class="lobby-ui" id="lobbyUi">
+    <div class="lobby-top">
+      <p class="eyebrow">Selamat Datang</p>
+      <h2 class="lobby-title">Momen Kami</h2>
+      <p class="lobby-hint" id="lobbyHint"></p>
+    </div>
+    <div class="lobby-story-head">
+      <p class="eyebrow">Cerita Kami</p>
+      <p class="lobby-hint">Ketuk foto untuk melihat lebih dekat</p>
+    </div>
+    <!-- labels floating over each photo group (positioned by gate3d.js) -->
+    <button class="lobby-tag" data-group="couple" type="button">Kedua Mempelai</button>
+    <button class="lobby-tag" data-group="map" type="button">Lokasi &amp; Tempat</button>
+    <button class="lobby-tag" data-group="story" type="button">Cerita Kami</button>
+    <!-- info card beside the photo being viewed; data-show picks the section -->
+    <div class="lobby-card" id="lobbyCard">
+      <section data-card="groom">
+        <p class="eyebrow">Mempelai Pria</p>
+        <h3 class="card-name">Adam</h3>
+        <p class="card-sub">Putra dari</p>
+        <p class="card-parents">Bapak Badru Kamal<br>&amp; Ibu Ika Kurnia</p>
+      </section>
+      <section data-card="couple">
+        <p class="eyebrow">Kedua Mempelai</p>
+        <h3 class="card-name">Adam <span class="amp">&amp;</span> Elsa</h3>
+      </section>
+      <section data-card="bride">
+        <p class="eyebrow">Mempelai Wanita</p>
+        <h3 class="card-name">Elsa</h3>
+        <p class="card-sub">Putri dari</p>
+        <p class="card-parents">Bapak Muhammad Hasan<br>&amp; Ibu Damini</p>
+      </section>
+      <section data-card="map">
+        <p class="eyebrow">Lokasi &amp; Tempat</p>
+        <h3 class="card-title">Golden Boutique Hotel</h3>
+        <p class="card-sub">Jakarta · Sabtu, 24 Oktober 2026</p>
+        <div class="card-map">
+          <iframe data-src="https://www.google.com/maps?q=Golden+Boutique+Hotel+Jakarta&amp;output=embed" title="Peta Golden Boutique Hotel" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="card-times">
+          <div><span>Akad Nikah</span><strong>13.00 WIB</strong></div>
+          <div><span>Resepsi</span><strong>16.00 WIB</strong></div>
+        </div>
+        <a class="btn-solid card-btn" href="https://www.google.com/maps/search/?api=1&amp;query=Golden+Boutique+Hotel+Jakarta" target="_blank" rel="noopener">Buka Google Maps</a>
+      </section>
+    </div>
+    <div class="lobby-bottom">
+      <button class="btn-outline lobby-back" id="lobbyBack" type="button">← Kembali</button>
+      <button class="btn-open lobby-next" id="lobbyNext" type="button">Lanjut ke Undangan</button>
+    </div>
+  </div>
   <div class="gate-flash" aria-hidden="true"></div>
+  <!-- verse shown over the white flash as the doors open -->
+  <div class="gate-ayat">
+    <span class="ayat-ornament" aria-hidden="true">❧</span>
+    <p class="ayat-ar" lang="ar" dir="rtl">وَمِنْ كُلِّ شَيْءٍ خَلَقْنَا زَوْجَيْنِ لَعَلَّكُمْ تَذَكَّرُوْنَ ﴿٤٩﴾</p>
+    <p class="ayat-id">“Dan segala sesuatu Kami ciptakan berpasang-pasangan agar kamu mengingat (kebesaran Allah).”</p>
+    <p class="ayat-src">QS. Az-Zariyat: 49</p>
+  </div>
 </section>
 
 <!-- music control, hidden until opened -->
@@ -85,13 +144,11 @@
   <section class="section quote-section">
     <div class="container narrow reveal">
       <span class="ornament">❧</span>
+      <p class="quote-arabic" lang="ar" dir="rtl">وَمِنْ كُلِّ شَيْءٍ خَلَقْنَا زَوْجَيْنِ لَعَلَّكُمْ تَذَكَّرُوْنَ ﴿٤٩﴾</p>
       <p class="quote-text">
-        <!-- PLACEHOLDER: swap verse/quote here if you'd like a different one -->
-        “Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan hidup dari jenismu sendiri,
-        agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.
-        Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda bagi kaum yang berpikir.”
+        “Dan segala sesuatu Kami ciptakan berpasang-pasangan agar kamu mengingat (kebesaran Allah).”
       </p>
-      <p class="quote-source">QS. Ar-Rum: 21</p>
+      <p class="quote-source">QS. Az-Zariyat: 49</p>
     </div>
   </section>
 
@@ -104,13 +161,13 @@
         <article class="couple-card">
           <div class="couple-photo"><img src="assets/img/02_ProfileAdam.jpg" alt="Adam" loading="lazy"></div>
           <h3 class="couple-name">Adam</h3>
-          <p class="couple-parents">Putra dari<br><span>[Nama Ayah Adam] &amp; [Nama Ibu Adam]</span></p>
+          <p class="couple-parents">Putra dari<br><span>Bapak Badru Kamal &amp; Ibu Ika Kurnia</span></p>
         </article>
         <div class="couple-amp" aria-hidden="true">&amp;</div>
         <article class="couple-card">
           <div class="couple-photo"><img src="assets/img/02_ProfileElsa.jpg" alt="Elsa" loading="lazy"></div>
           <h3 class="couple-name">Elsa</h3>
-          <p class="couple-parents">Putri dari<br><span>[Nama Ayah Elsa] &amp; [Nama Ibu Elsa]</span></p>
+          <p class="couple-parents">Putri dari<br><span>Bapak Muhammad Hasan &amp; Ibu Damini</span></p>
         </article>
       </div>
     </div>

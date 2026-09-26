@@ -32,11 +32,10 @@
       // autoplay blocked; user can tap the music button manually
       musicToggle.querySelector('.music-icon').classList.add('paused');
     });
-    // 3D gate (gate3d.js) walks up to the doors and in first, if it loaded
+    // 3D gate (gate3d.js): walk in, verse, lobby — resolves when the guest
+    // taps "Lanjut ke Undangan" (or right away if the scene never loaded)
     const scene3d = window.weddingGate;
-    const flyIn = scene3d ? scene3d.flyIn() : Promise.resolve();
-    const timeout = new Promise((resolve) => setTimeout(resolve, 15000));
-    Promise.race([flyIn, timeout]).then(revealSite);
+    Promise.resolve(scene3d ? scene3d.flyIn() : null).then(revealSite, revealSite);
   }
 
   function revealSite() {
