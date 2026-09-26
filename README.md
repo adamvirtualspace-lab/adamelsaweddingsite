@@ -5,6 +5,8 @@ Akad 13.00 WIB · Resepsi 16.00 WIB.
 
 Plain HTML/CSS/JS, no build step. See [PLAN.md](PLAN.md) for design decisions.
 
+The opening screen is a low-poly 3D model of the Golden Boutique Hotel ([gate3d.js](gate3d.js), Three.js loaded from jsDelivr). The camera eases in from the left at eye level, then sways with the mouse (desktop) or the phone's tilt (gyro; iOS asks for permission on the first tap). Tapping "Buka Undangan" walks the camera around the fountain and up the red carpet, the lobby doors swing open, and the invitation appears. If WebGL or the CDN isn't available, the plain gate still works.
+
 ## Run locally
 
 Open `index.html` directly, or serve it (recommended, so relative fetches behave):

@@ -34,15 +34,26 @@
 
 <!-- ============ GATE / COVER ============ -->
 <section id="gate" class="gate">
+  <!-- low-poly Golden Boutique Hotel, rendered by gate3d.js -->
+  <canvas id="gateCanvas" class="gate-canvas" aria-hidden="true"></canvas>
+  <div class="gate-scrim" aria-hidden="true"></div>
+  <div class="gate-loader" aria-hidden="true"><span></span></div>
   <div class="gate-inner">
-    <p class="eyebrow">The Wedding Celebration Of</p>
-    <h1 class="gate-names"><span>Adam</span><span class="amp">&amp;</span><span>Elsa</span></h1>
-    <div class="gate-divider"></div>
-    <p class="gate-guest">Kepada Bapak/Ibu/Saudara/i,<br><strong id="guestName">Tamu Undangan</strong></p>
-    <button id="openBtn" class="btn-open" type="button">
-      <span class="btn-open-icon">✉</span> Buka Undangan
-    </button>
+    <div class="gate-top">
+      <p class="eyebrow">The Wedding Celebration Of</p>
+      <h1 class="gate-names"><span>Adam</span><span class="amp">&amp;</span><span>Elsa</span></h1>
+      <p class="gate-hint" id="motionHint" hidden>Ketuk layar untuk mengaktifkan efek gerak</p>
+    </div>
+    <div class="gate-bottom">
+      <p class="gate-venue">Golden Boutique Hotel · 24.10.2026</p>
+      <div class="gate-divider"></div>
+      <p class="gate-guest">Kepada Bapak/Ibu/Saudara/i,<br><strong id="guestName">Tamu Undangan</strong></p>
+      <button id="openBtn" class="btn-open" type="button">
+        <span class="btn-open-icon">✉</span> Buka Undangan
+      </button>
+    </div>
   </div>
+  <div class="gate-flash" aria-hidden="true"></div>
 </section>
 
 <!-- music control, hidden until opened -->
@@ -260,5 +271,12 @@
 </main>
 
 <script src="script.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.min.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="gate3d.js"></script>
 </body>
 </html>

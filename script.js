@@ -21,23 +21,42 @@
   const musicToggle = document.getElementById('musicToggle');
   const bgm = document.getElementById('bgm');
 
+  let opening = false;
   function openInvitation() {
-    gate.classList.add('gate-hidden');
-    siteMain.hidden = false;
-    document.body.style.overflow = '';
+    if (opening) return;
+    opening = true;
+    // music has to start inside the click gesture, before the fly-in
     musicToggle.hidden = false;
     bgm.volume = 0.5;
     bgm.play().catch(() => {
       // autoplay blocked; user can tap the music button manually
       musicToggle.querySelector('.music-icon').classList.add('paused');
     });
-    setTimeout(() => gate.remove(), 900);
+    // 3D gate (gate3d.js) walks up to the doors and in first, if it loaded
+    const scene3d = window.weddingGate;
+    const flyIn = scene3d ? scene3d.flyIn() : Promise.resolve();
+    const timeout = new Promise((resolve) => setTimeout(resolve, 15000));
+    Promise.race([flyIn, timeout]).then(revealSite);
+  }
+
+  function revealSite() {
+    gate.classList.add('gate-hidden');
+    siteMain.hidden = false;
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      if (window.weddingGate) window.weddingGate.dispose();
+      gate.remove();
+    }, 900);
     initReveal();
     updateParallax();
   }
 
   document.body.style.overflow = 'hidden';
   openBtn.addEventListener('click', openInvitation);
+  // if the 3D scene never shows up (no WebGL / CDN blocked), drop the loader
+  setTimeout(() => {
+    if (!gate.classList.contains('is-ready')) gate.classList.add('no-scene');
+  }, 10000);
 
   musicToggle.addEventListener('click', () => {
     const icon = musicToggle.querySelector('.music-icon');
