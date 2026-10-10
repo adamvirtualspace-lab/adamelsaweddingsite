@@ -495,10 +495,3 @@
   .inv-bank-card{width:50%;}
   .inv-bank-logo{max-width:15%;}
 }
-
-@media (prefers-reduced-motion: reduce){
-  .anim-up, .anim-left, .anim-fade, .anim-zoom, .anim-draw{opacity:1;transform:none;transition:none;}
-  .anim-draw path, .anim-draw line{stroke-dashoffset:0;transition:none;}
-  .wg-btn::after{animation:none;}
-  .welcome-gate{transition:none;}
-}
