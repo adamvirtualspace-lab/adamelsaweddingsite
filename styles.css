@@ -304,10 +304,3 @@ a{color:inherit;}
 }
 .music-icon.paused{background-position:0 0;animation:none;}
 @keyframes music-spin{to{transform:rotate(360deg);}}
-
-/* ============ reduced motion ============ */
-@media (prefers-reduced-motion: reduce){
-  .btn-open{animation:none;}
-  .music-icon{animation:none;}
-  html{scroll-behavior:auto;}
-}
