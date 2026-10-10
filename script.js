@@ -429,9 +429,6 @@
 
   // ---------- scroll hint on the hero ----------
   const scrollHint = document.querySelector('.inv-scroll-hint');
-  scrollHint.addEventListener('click', () => {
-    scrollHint.closest('.inv-sec').nextElementSibling.scrollIntoView({ behavior: 'smooth' });
-  });
   const hideScrollHint = () => {
     if (window.scrollY < 40) return;
     scrollHint.classList.add('is-gone');

@@ -29,7 +29,7 @@ python -m http.server 8000
 
 Then visit `http://localhost:8000/?to=Nama+Tamu` — the `to` query param personalizes the greeting on the cover screen (and prefills the RSVP name).
 
-Add `simple` to skip the 3D opener and land straight on the invitation page ("Dear, Nama Tamu" on the hero photo), e.g. `?to=Nama+Tamu&simple` (or just `?simple`). Browsers only let music start after a tap, so it starts on the guest's first tap (or right away, if the browser allows it). A "Scroll" hint runs down the hero's left edge (arrows sliding down a line from under the greeting to the word "Scroll"); it fades once the guest scrolls, and tapping it scrolls down for them.
+Add `simple` to skip the 3D opener and land straight on the invitation page ("Dear, Nama Tamu" on the hero photo), e.g. `?to=Nama+Tamu&simple` (or just `?simple`). Browsers only let music start after a tap, so it starts on the guest's first tap (or right away, if the browser allows it). A "Scroll" hint runs down the hero's left edge (arrows sliding down a line from under the greeting to the word "Scroll"); it is only a hint (taps go straight through it) and fades once the guest scrolls.
 
 The Claude Code preview (`.claude/launch.json`) serves on port 8811 with `Cache-Control: no-store`, so edits always show on reload.
 
