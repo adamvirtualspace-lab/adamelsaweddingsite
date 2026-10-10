@@ -8,7 +8,7 @@ Plain HTML/CSS/JS, no build step. See [PLAN.md](PLAN.md) for design decisions.
 **Live site:** https://adamvirtualspace-lab.github.io/adamelsaweddingsite/ (GitHub Pages, deployed from `main`)
 
 - With a guest's name: https://adamvirtualspace-lab.github.io/adamelsaweddingsite/?to=Nama+Tamu
-- Without the 3D opener (2D cover instead): https://adamvirtualspace-lab.github.io/adamelsaweddingsite/?to=Nama+Tamu&simple
+- Without the 3D opener (straight onto the invitation, lighter for older phones): https://adamvirtualspace-lab.github.io/adamelsaweddingsite/?to=Nama+Tamu&simple
 
 The opening screen is a low-poly 3D model of the Golden Boutique Hotel ([gate3d.js](gate3d.js), Three.js loaded from jsDelivr). The opening text (names, guest, "Buka Undangan") sits at the top of the screen with the hotel below it.
 
@@ -29,7 +29,7 @@ python -m http.server 8000
 
 Then visit `http://localhost:8000/?to=Nama+Tamu` — the `to` query param personalizes the greeting on the cover screen (and prefills the RSVP name).
 
-Add `simple` to skip the 3D opener and use the original template's 2D cover instead ("Dear, Nama Tamu — You Are Invited! … Open Invitation"), e.g. `?to=Nama+Tamu&simple` (or just `?simple`). Tapping the cover slides it up and starts the music.
+Add `simple` to skip the 3D opener and land straight on the invitation page ("Dear, Nama Tamu" on the hero photo), e.g. `?to=Nama+Tamu&simple` (or just `?simple`). Browsers only let music start after a tap, so it starts on the guest's first tap (or right away, if the browser allows it). A "Scroll" hint at the hero's left edge fades once the guest scrolls; tapping it scrolls down for them.
 
 The Claude Code preview (`.claude/launch.json`) serves on port 8811 with `Cache-Control: no-store`, so edits always show on reload.
 
