@@ -115,31 +115,41 @@
 .inv-hero p{color:#ffffff;}
 .inv-hero-of, .inv-hero-date{font-family:var(--font-body);font-size:16px;letter-spacing:2px;}
 .inv-hero-names{font-family:var(--font-play);font-size:35px;line-height:0.9em;}
-/* "Scroll" hint at the hero's left edge: the word on its side, a line with a light running
-   down it, and a small arrow; it fades in after the hero text and out once the guest scrolls */
+/* "Scroll" hint down the hero's left edge: a faint line from under the greeting to the word
+   "Scroll", with arrows sliding down it one after another; it fades in after the hero text
+   and out once the guest scrolls */
 .inv-scroll-hint{
-  position:absolute;z-index:2;left:max(10px, env(safe-area-inset-left));bottom:56px;
-  display:flex;flex-direction:column;align-items:center;gap:8px;
+  position:absolute;z-index:2;left:max(10px, env(safe-area-inset-left));
+  top:clamp(150px, 22vh, 220px);bottom:56px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
   padding:6px;border:0;background:none;color:#ffffff;cursor:pointer;
   font-family:var(--font-body);font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;
   text-shadow:0 0 6px rgba(0,0,0,0.6);filter:drop-shadow(0 0 3px rgba(0,0,0,0.45));
   opacity:0;animation:scroll-hint-in 1s 1.2s forwards;transition:opacity .5s;
 }
 .inv-scroll-label{writing-mode:vertical-rl;}
-.inv-scroll-line{position:relative;width:2px;height:56px;overflow:hidden;background:rgba(255,255,255,0.55);}
-.inv-scroll-line::after{
-  content:'';position:absolute;left:0;top:-40%;width:2px;height:40%;background:#ffffff;
-  animation:scroll-hint-run 1.8s ease-in-out infinite;
+.inv-scroll-trail{position:relative;flex:1;width:14px;}
+.inv-scroll-trail::before{
+  content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;
+  background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0.6) 25%,rgba(255,255,255,0.6) 100%);
 }
-.inv-scroll-arrow{
-  width:10px;height:10px;margin-top:-12px;
-  border-right:2px solid #ffffff;border-bottom:2px solid #ffffff;transform:rotate(45deg);
-  animation:scroll-hint-bob 1.8s ease-in-out infinite;
+.inv-scroll-trail i{
+  position:absolute;left:1px;top:0;width:12px;height:12px;
+  border-right:2.5px solid #ffffff;border-bottom:2.5px solid #ffffff;
+  transform:rotate(45deg);opacity:0;
+  filter:drop-shadow(0 0 2px rgba(0,0,0,0.6));
+  animation:scroll-hint-slide 2.7s cubic-bezier(.45,0,.55,1) infinite;
 }
+.inv-scroll-trail i:nth-child(2){animation-delay:.9s;}
+.inv-scroll-trail i:nth-child(3){animation-delay:1.8s;}
 .inv-scroll-hint.is-gone{opacity:0 !important;pointer-events:none;}
 @keyframes scroll-hint-in{to{opacity:1;}}
-@keyframes scroll-hint-run{to{top:100%;}}
-@keyframes scroll-hint-bob{50%{transform:translateY(4px) rotate(45deg);}}
+@keyframes scroll-hint-slide{
+  0%{top:0;opacity:0;}
+  15%{opacity:1;}
+  80%{opacity:1;}
+  100%{top:calc(100% - 14px);opacity:0;}
+}
 
 /* ============ verse + photo ============ */
 .inv-verse .inv-verse-card{
@@ -415,8 +425,7 @@
   .inv-hero .inv-row{max-width:none;padding-bottom:20px;}
   .inv-hero-of, .inv-hero-date{font-size:18px;letter-spacing:4px;}
   .inv-hero-names{font-size:clamp(56px,6vw,84px);line-height:1em;}
-  .inv-scroll-hint{left:40px;bottom:80px;font-size:14px;gap:10px;}
-  .inv-scroll-line{height:80px;}
+  .inv-scroll-hint{left:40px;bottom:80px;font-size:14px;gap:14px;}
   .inv-divider-bottom, .inv-divider-top{background-size:100% 60px;height:60px;}
   .inv-divider-44{background-size:100% 70px;height:70px;}
 
