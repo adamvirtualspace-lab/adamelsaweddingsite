@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<!-- our own sending list: not linked from the invitation, kept out of search engines -->
+<title>Undangan Adam &amp; Elsa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Urbanist:wght@400;500;600;700&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  /* Layout: one narrow column of guest rows grouped by circle, the wedding site's own palette and faces */
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --fg: #383838;
+    --muted: #6f7680;
+    --line: #e3e1db;
+    --accent: #5d6d84;
+    --accent-soft: #e6eaf0;
+    --wa: #1f8a4c;
+    --wa-fg: #ffffff;
+    --done: #8a9099;
+    --font-display: "DM Serif Display", Georgia, "Times New Roman", serif;
+    --font-body: "Urbanist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17191c; --surface: #202328; --fg: #ebe9e4; --muted: #a3a9b2; --line: #33373e;
+      --accent: #a9b6c9; --accent-soft: #2b3139; --wa: #2aa860; --wa-fg: #0d1a12; --done: #7c828b;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17191c; --surface: #202328; --fg: #ebe9e4; --muted: #a3a9b2; --line: #33373e;
+    --accent: #a9b6c9; --accent-soft: #2b3139; --wa: #2aa860; --wa-fg: #0d1a12; --done: #7c828b;
+    color-scheme: dark;
+  }
+
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.5; padding: 0 16px; }
+  .wrap { max-width: 680px; margin: 0 auto; padding-block: 32px 64px; display: grid; gap: 28px; }
+
+  header { display: grid; gap: 10px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0; }
+  h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 7vw, 40px); line-height: 1.1; margin: 0; text-wrap: balance; }
+  .facts { margin: 0; color: var(--muted); }
+  .how { margin: 0; padding: 14px 16px; background: var(--accent-soft); border-radius: 10px; font-size: 15px; }
+  .how ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 2px; }
+  .progress { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .bar { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+
+  section { display: grid; gap: 10px; }
+  h2 { font-family: var(--font-display); font-weight: 400; font-size: 22px; margin: 0; display: flex; align-items: baseline; gap: 10px; }
+  h2 small { font-family: var(--font-body); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .note { margin: -4px 0 4px; font-size: 14px; color: var(--muted); }
+
+  .list { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  .guest { padding: 14px 16px; display: grid; gap: 10px; border-top: 1px solid var(--line); }
+  .guest:first-child { border-top: 0; }
+  .guest.group { background: var(--accent-soft); border-radius: 11px 11px 0 0; }
+  .top { display: flex; align-items: flex-start; gap: 12px; }
+  .who { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  .name { font-weight: 600; font-size: 17px; }
+  .tag { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .link { font-family: var(--font-mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; user-select: all; }
+  .sent { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); white-space: nowrap; cursor: pointer; padding-top: 2px; }
+  .sent input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+  .guest.is-sent .name { color: var(--done); text-decoration: line-through; text-decoration-thickness: 1px; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn { font: 600 14px/1 var(--font-body); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn.wa { background: var(--wa); border-color: var(--wa); color: var(--wa-fg); }
+  .btn.ok { border-color: var(--accent); color: var(--accent); }
+
+  details { font-size: 14px; }
+  summary { cursor: pointer; color: var(--muted); width: fit-content; }
+  pre { white-space: pre-wrap; font-family: var(--font-body); font-size: 14px; margin: 8px 0 0; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line); }
+
+  footer { font-size: 13px; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { .bar span { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Daftar undangan · keluarga &amp; sahabat</p>
+    <h1>Undangan Adam &amp; Elsa</h1>
+    <p class="facts">Sabtu, 24 Oktober 2026 · Akad 12.30 WIB · Resepsi 16.00 WIB · Golden Boutique Hotel Kemayoran</p>
+    <div class="how">
+      Setiap tamu punya link sendiri. Namanya muncul di halaman pembuka dan otomatis terisi di form RSVP.
+      <ol>
+        <li><b>Kirim via WhatsApp</b> membuka WhatsApp dengan pesan yang sudah siap. Tinggal pilih kontak atau grupnya.</li>
+        <li>Atau <b>Salin pesan</b>, lalu tempel di chat.</li>
+        <li>Centang <b>Terkirim</b> supaya tahu siapa yang belum. Centangnya hanya tersimpan di perangkat ini.</li>
+      </ol>
+    </div>
+    <div class="progress"><div class="bar"><span id="bar"></span></div><span id="count">0 / 0 terkirim</span></div>
+  </header>
+
+  <main id="lists" style="display:grid;gap:28px"></main>
+
+  <footer>Link keluarga dan grup (bit.ly) membuka undangan di situs kita dengan tampilan ringan untuk HP lama. Link teman membuka undangan NgantenStory.</footer>
+</div>
+
+<script>
+  // Bitly links for the family and the two groups (each one points to the guest's own ?to=…&simple
+  // link on this site); the friends get their NgantenStory invitation link
+  const NSTORY = (name) => 'https://inv.nstory.id/adam-elsa/?to=' + encodeURIComponent(name);
+  const SECTIONS = [
+    {
+      id: 'keluarga', title: 'Keluarga & kerabat',
+      guests: [
+        ['Kel. Besar Uncu Farid Zainuddin', 'https://bit.ly/AdamElsaWed-KelBesarUncuFarid'],
+        ['Bapak & Ibu Nungky Seno', 'https://bit.ly/AdamElsaWed-BpkIbuNungkySeno'],
+        ['Ibu Tini', 'https://bit.ly/AdamElsaWed-IbuTini'],
+        ['Bapak & Ibu Mauludin', 'https://bit.ly/AdamElsaWed-BpkIbuMauludin'],
+        ['Bapak & Ibu Aidil', 'https://bit.ly/AdamElsaWed-BpkIbuAidil'],
+        ['Adhit & Intan beserta Keluarga', 'https://bit.ly/AdamElsaWed-AdhitIntanKel'],
+        ['Ibu Gita Puspita beserta Keluarga', 'https://bit.ly/AdamElsaWed-IbuGitaPuspitaKel'],
+        ['Ibu Ati Haryati', 'https://bit.ly/AdamElsaWed-IbuAtiHaryati'],
+        ['Keluarga Besar Bude Mimi', 'https://bit.ly/AdamElsaWed-KelBesarBudeMimi'],
+        ['Keluarga Besar Pakde Mumuh', 'https://bit.ly/AdamElsaWed-KelBesarPakdeMumu'],
+        ['Om Budi beserta Keluarga', 'https://bit.ly/AdamElsaWed-OmBudiKel'],
+        ['Teh Emi beserta Keluarga', 'https://bit.ly/AdamElsaWed-TehEmiKel'],
+        ['Teh Iis beserta Keluarga', 'https://bit.ly/AdamElsaWed-TehIisKel'],
+        ['Bapak & Ibu Ujang', 'https://bit.ly/AdamElsaWed-BpkIbuUjang'],
+      ],
+    },
+    {
+      id: 'csr', title: 'Besti2 CSR',
+      group: ['Besti2 CSR', 'https://bit.ly/AdamElsaWed-Besti2CSR'],
+      note: 'Kirim satu link ke grup WhatsApp, atau satu per satu ke masing-masing.',
+      guests: ['Wiwi', 'Yuyun', 'Eza', 'Uchi', 'Iin', 'Upik', 'Tridjata', 'Riama', 'Lina'].map((n) => [n, NSTORY(n)]),
+    },
+    {
+      id: 'smpn1', title: 'Besti2 SMPN 1 Sementara Jogja',
+      group: ['Besti2 SMPN 1 Sementara Jogja', 'https://bit.ly/AdamElsaWed-Besti2SMPN1Jogja'],
+      note: 'Kirim satu link ke grup WhatsApp, atau satu per satu ke masing-masing.',
+      guests: ['Hariroh', 'Etty', 'Yana', 'Alen', 'Mia', 'Wati', 'Elia', 'Dewi', 'Nining'].map((n) => [n, NSTORY(n)]),
+    },
+  ];
+
+  const messageFor = (name, link) => [
+    "Assalamu'alaikum Wr. Wb.",
+    '',
+    `Kepada Yth. *${name}*,`,
+    '',
+    'Tanpa mengurangi rasa hormat, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk hadir di acara pernikahan kami:',
+    '',
+    '*Adam & Elsa*',
+    'Sabtu, 24 Oktober 2026',
+    'Akad: 12.30 WIB · Resepsi: 16.00 WIB',
+    'Golden Boutique Hotel Kemayoran, Jakarta',
+    '',
+    'Info lengkap & RSVP:',
+    link,
+    '',
+    'Merupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.',
+    '',
+    "Wassalamu'alaikum Wr. Wb.",
+    'Adam & Elsa',
+  ].join('\n');
+
+  // "sent" ticks: a per-device convenience only
+  const STORE = 'adam-elsa-sent';
+  let sent = {};
+  try { sent = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) { sent = {}; }
+  const saveSent = () => { try { localStorage.setItem(STORE, JSON.stringify(sent)); } catch (e) { /* not saved on this device */ } };
+
+  const el = (tag, props = {}, ...kids) => {
+    const n = Object.assign(document.createElement(tag), props);
+    kids.forEach((k) => n.append(k));
+    return n;
+  };
+
+  async function copy(text, btn, label) {
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = 'Tersalin ✓';
+      btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = label; btn.classList.remove('ok'); }, 1600);
+    } catch (e) {
+      // clipboard refused: open the message so it can be selected by hand
+      const row = btn.closest('.guest');
+      const d = row.querySelector('details');
+      d.open = true;
+      const range = document.createRange();
+      range.selectNodeContents(label === 'Salin link' ? row.querySelector('.link') : d.querySelector('pre'));
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      btn.textContent = 'Teks dipilih, salin manual';
+    }
+  }
+
+  let total = 0;
+  const updateCount = () => {
+    const done = Object.values(sent).filter(Boolean).length;
+    document.getElementById('count').textContent = `${done} / ${total} terkirim`;
+    document.getElementById('bar').style.width = total ? (done / total * 100) + '%' : '0';
+  };
+
+  function row([name, link], isGroup) {
+    const id = 'sent-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const msg = messageFor(name, link);
+    const li = el('li', { className: 'guest' + (isGroup ? ' group' : '') });
+
+    const box = el('input', { type: 'checkbox', id, checked: !!sent[name] });
+    const setState = () => li.classList.toggle('is-sent', box.checked);
+    box.addEventListener('change', () => { sent[name] = box.checked; saveSent(); setState(); updateCount(); });
+    setState();
+
+    const who = el('div', { className: 'who' });
+    if (isGroup) who.append(el('span', { className: 'tag', textContent: 'Untuk grup' }));
+    who.append(el('span', { className: 'name', textContent: name }), el('span', { className: 'link', textContent: link }));
+
+    const wa = el('a', { className: 'btn wa', href: 'https://wa.me/?text=' + encodeURIComponent(msg), target: '_blank', rel: 'noopener', textContent: 'Kirim via WhatsApp' });
+    const copyMsg = el('button', { type: 'button', className: 'btn', textContent: 'Salin pesan' });
+    copyMsg.addEventListener('click', () => copy(msg, copyMsg, 'Salin pesan'));
+    const copyLink = el('button', { type: 'button', className: 'btn', textContent: 'Salin link' });
+    copyLink.addEventListener('click', () => copy(link, copyLink, 'Salin link'));
+
+    li.append(
+      el('div', { className: 'top' }, who, el('label', { className: 'sent', htmlFor: id }, box, 'Terkirim')),
+      el('div', { className: 'actions' }, wa, copyMsg, copyLink),
+      el('details', {}, el('summary', { textContent: 'Lihat pesan' }), el('pre', { textContent: msg })),
+    );
+    total++;
+    return li;
+  }
+
+  const lists = document.getElementById('lists');
+  SECTIONS.forEach((s) => {
+    const count = s.guests.length + (s.group ? 1 : 0);
+    const sec = el('section', { id: s.id },
+      el('h2', {}, s.title, el('small', { textContent: s.group ? `grup + ${s.guests.length} orang` : `${count} undangan` })));
+    if (s.note) sec.append(el('p', { className: 'note', textContent: s.note }));
+    const ul = el('ul', { className: 'list' });
+    if (s.group) ul.append(row(s.group, true));
+    s.guests.forEach((g) => ul.append(row(g, false)));
+    sec.append(ul);
+    lists.append(sec);
+  });
+  updateCount();
+</script>
+</body>
+</html>
